@@ -1,0 +1,21 @@
+Flow equation methods diagonalize the Hamiltonian by successively applying infinitesimal unitary transforms  dU(l) = \exp(-\eta(l) dl) = 1 - \eta(l) dl , where  \eta(l)  is the generator and  l  represents a fictitious ‘flow time’ such that  l = 0  is the initial Hamiltonian. The parameterized Hamiltonian  H(l) = U^{\dagger}(l) H U(l)  becomes diagonal in the limit  l \to \infty , where the full unitary transform  U(l)  is a time-ordered integral over flow time  l . The diagonalization procedure can be recast as solving the equation of motion
+
+
+\frac{dH}{dl} = [\eta(l), H(l)]
+
+
+(refs. 23, 24). We store  H^{(2)}  as a matrix with  O(L^2)  entries and  H^{(4)}  as a tensor of order four with  O(L^4)  real entries, and we employ a similar procedure for the generator  \eta(l) =: \eta^{(2)}(l) + \eta^{(4)}(l) . This allows the relevant commutators to be computed efficiently as the sum of all one-point contractions of pairs of matrices or tensors ^{26} , at a cost polynomial in system size. In all of the following, we truncate at fourth order,  O(L^4) . The main consequence of fermionic statistics is the minus signs, which arise when computing the contractions. The method can be applied to bosons with minor changes.
+
+A common choice of generator is  \eta(l) = [H_0, V(l)] , where  H_0(l)  and  V(l)  are, respectively, the diagonal and off-diagonal parts of the Hamiltonian. In the following, we use the symbol  V  for off-diagonal elements. This is often known as the Wegner generator ^{23, 24} . The diagonalization can be seen because the squared  \|V(l)\|_2^2  is non-increasing in the fictitious time  l  as
+
+
+\frac{d}{dl} \|V(l)\|_2^2 = -2 \| \eta(l) \|_2^2 \leq 0
+
+
+(see, for example, ref. 27). Convergence relies upon the model in question having a clear separation of energy scales in the initial basis. Models where this is not true (such as homogeneous systems and disordered systems with many near-degeneracies) cannot be fully diagonalized by this generator, as they act like unstable fixed points. Perturbing the Hamiltonian away from this fixed point can allow the flow to begin. However, small perturbations can result in long convergence times, whereas large perturbations improve convergence but risk changing the underlying physics.
+
+Here, we resolve this by introducing scrambling transforms, which are targeted unitary transforms aimed at lifting degeneracies, which the Wegner procedure alone is unable to resolve. As they are unitary, they cannot change the underlying physics. They simply act to ‘prepare’ the Hamiltonian in a basis more amenable to being diagonalized by the conventional Wegner flow (Fig. 1). The (infinitesimal) scrambling transform takes the form
+
+
+dS(l) = \exp(-\lambda(l) dl)
+

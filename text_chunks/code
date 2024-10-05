@@ -10,7 +10,6 @@ from matplotlib.colors import LinearSegmentedColormap
 from pathlib import Path
 from dataclasses import dataclass
 from scipy.stats import gaussian_kde
-import pickle
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -22,7 +21,6 @@ class ModelConfig:
     plot_name: str
     color: str
 
-
 @dataclass
 class PerplexityResult:
     perplexities: List[float]
@@ -31,7 +29,7 @@ class PerplexityResult:
 
 
 def calculate_per_token_perplexity(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, input_string: str, k: int) -> \
-        List[float]:
+List[float]:
     input_ids = tokenizer.encode(input_string, return_tensors="pt").to(model.device)
     num_tokens = input_ids.size(1) - 1
 
@@ -79,7 +77,6 @@ def load_model(model_config: ModelConfig, cache_dir: str) -> Tuple[AutoModelForC
     except Exception as e:
         logger.error(f"Failed to load model {model_config.name}: {e}")
         raise
-
 
 def process_text_file(file_path: Path, models: Dict[str, Tuple[AutoModelForCausalLM, AutoTokenizer]], args) -> Dict[
     str, List[float]]:
@@ -172,26 +169,19 @@ def plot_perplexities(results: Dict[str, PerplexityResult], model_configs: List[
     cbar = plt.colorbar(scatter, ax=ax2, pad=0.02)
     cbar.set_label('Density', rotation=270, labelpad=15, fontsize=10, fontweight='bold')
 
+
     plt.tight_layout()
     plot_path = plot_dir / f"triviality_{file_name}.png"
     plt.savefig(plot_path, dpi=300, bbox_inches="tight")
     plt.close()
 
-    return triviality
-
-
-def save_pickle(data, file_path: Path):
-    with open(file_path, 'wb') as f:
-        pickle.dump(data, f)
-
 
 def main():
     parser = ArgumentParser()
     parser.add_argument("--k", type=int, default=100, help="Start calculating perplexity from the k-th token")
-    parser.add_argument("--max_words", type=int, default=1000, help="Maximum number of words to process")
+    parser.add_argument("--max_words", type=int, default=700, help="Maximum number of words to process")
     parser.add_argument("--cache_dir", type=str, default="~/", help="Cache directory for models")
     parser.add_argument("--plot_dir", type=str, default="plots", help="Directory to save plots")
-    parser.add_argument("--pickle_dir", type=str, default="pickles", help="Directory to save pickle files")
     args = parser.parse_args()
 
     model_configs = [
@@ -202,16 +192,11 @@ def main():
     text_files = list(Path("text_chunks").glob("*"))
     plot_dir = Path(args.plot_dir)
     plot_dir.mkdir(exist_ok=True)
-    pickle_dir = Path(args.pickle_dir)
-    pickle_dir.mkdir(exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
 
     models: Dict[str, Tuple[Optional[AutoModelForCausalLM], Optional[AutoTokenizer]]] = {}
-    all_results = {}
-    all_trivialities = {}
-
     try:
         for config in model_configs:
             models[config.name] = load_model(config, args.cache_dir)
@@ -220,20 +205,9 @@ def main():
             results = process_text_file(file_path, models, args)
             if results:
                 statistics = {name: calculate_statistics(perplexities) for name, perplexities in results.items()}
-
-                triviality = plot_perplexities(statistics, model_configs, file_path.name, plot_dir)
-
-                all_results[file_path.name] = results
-                all_trivialities[file_path.name] = triviality
+                plot_perplexities(statistics, model_configs, file_path.name, plot_dir)
             else:
                 logger.warning(f"Skipping plot for {file_path.name} due to processing errors.")
-
-        # Save all results as pickle
-        save_pickle(all_results, pickle_dir / "all_results.pkl")
-        save_pickle(all_trivialities, pickle_dir / "all_trivialities.pkl")
-
-        logger.info(f"All results saved to {pickle_dir / 'all_results.pkl'}")
-        logger.info(f"All trivialities saved to {pickle_dir / 'all_trivialities.pkl'}")
 
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
