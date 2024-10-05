@@ -2,7 +2,7 @@
 
 ## Overview
 
-This script calculates and compares the **per-token perplexity** of input text across multiple language models, and generates visual plots to assess the **triviality** of text. Triviality is computed as the ratio of log perplexities from two models—typically a smaller and a larger model—on the same text.
+This script calculates and compares the **per-token perplexity** of input text across multiple language models, and generates visual plots to assess the **triviality** of the text. Triviality is computed as the ratio of log perplexities from two models—typically a smaller and a larger model—on the same text.
 
 The workflow involves:
 1. Loading pre-trained language models.
