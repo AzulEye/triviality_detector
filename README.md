@@ -48,5 +48,7 @@ This project is licensed under the MIT License.
 
 ## Author
 Aharon Azulay
+
 aazuleye@gmail.com
+
 For further details, feel free to explore the code and modify it based on your specific needs.
