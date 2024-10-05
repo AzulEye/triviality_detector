@@ -1,4 +1,4 @@
-# Triviality Analysis README
+# Triviality Analysis of Text Using Language Models
 
 ## Overview
 
